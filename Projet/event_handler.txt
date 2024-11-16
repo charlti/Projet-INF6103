@@ -1,0 +1,8 @@
+a = p1.value;
+
+if (a == 1){
+    val_2.writeDataPoint('DP_128213', 0)
+}
+else{
+    val_2.writeDataPoint('DP_128213', 1)
+}
