@@ -31,14 +31,14 @@ def serveur_tcp(serveur_ip, serveur_port):
         serveur_socket.close()
 
 TCP_SERVER_SEND_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_SEND_PORT = "5678"    # On choisit un port 
+TCP_SERVER_SEND_PORT = 5678    # On choisit un port 
 
 TCP_SERVER_REC_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_REC_PORT = "1234"    # On choisit un port 
+TCP_SERVER_REC_PORT = 1234    # On choisit un port 
 
 def envoyer_donnees(donnees, serveur_ip=TCP_SERVER_SEND_IP, serveur_port=TCP_SERVER_SEND_PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(TCP_SERVER_SEND_IP, TCP_SERVER_SEND_PORT)
+        s.connect((TCP_SERVER_SEND_IP, TCP_SERVER_SEND_PORT))
         print(f"Connecté au serveur {serveur_ip}:{serveur_port}")
         s.sendall(donnees.encode("utf-8"))
 
