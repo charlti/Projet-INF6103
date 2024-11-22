@@ -10,7 +10,10 @@
         <route-files value="cross.rou.xml"/>
         <additional-files value="cross.det.xml"/>
     </input>
-
+    <configuration>
+        <step-length value="1.0" />
+        <collision.action value="warn" />
+    </configuration>
     <time>
         <begin value="0"/>
     </time>
