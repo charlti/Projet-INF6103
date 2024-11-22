@@ -8,6 +8,8 @@ import sys
 import optparse
 import random
 import socket
+import threading
+import queue
 
 state = []
 
@@ -21,14 +23,53 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-TCP_SERVER_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_PORT = "1234"    # On choisit un port 
+TCP_SERVER_SEND_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
+TCP_SERVER_SEND_PORT = "1234"    # On choisit un port 
 
-def envoyer_donnees(donnees, serveur_ip=TCP_SERVER_IP, serveur_port=TCP_SERVER_PORT):
+TCP_SERVER_REC_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
+TCP_SERVER_REC_PORT = "5678"    # On choisit un port 
+
+command_queue = queue.Queue()
+
+def envoyer_donnees(donnees, serveur_ip=TCP_SERVER_SEND_IP, serveur_port=TCP_SERVER_SEND_PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(TCP_SERVER_IP, TCP_SERVER_PORT)
+        s.connect(TCP_SERVER_SEND_IP, TCP_SERVER_SEND_PORT)
         print(f"Connecté au serveur {serveur_ip}:{serveur_port}")
         s.sendall(donnees.encode("utf-8"))
+
+
+def serveur_tcp():
+    """ Fonction pour gérer la connexion TCP et envoyer/recevoir des données """
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((TCP_SERVER_REC_IP, TCP_SERVER_REC_PORT))
+    server_socket.listen(1)
+    print(f"Serveur TCP en écoute sur {TCP_SERVER_REC_IP}:{TCP_SERVER_REC_PORT}")
+
+    client_socket, client_address = server_socket.accept()
+    print(f"Connexion établie avec {client_address}")
+
+    try:
+        while True:
+            # Recevoir des données du client
+            data = client_socket.recv(1024).decode('utf-8')
+            if not data:
+                break  # Si aucune donnée n'est reçue, on ferme la connexion
+
+            print(f"Commande reçue : {data}")
+
+            # Ajouter la commande dans la queue
+            command_queue.put(data)
+
+            # Envoyer l'état actuel des feux au client
+            state = traci.trafficlight.getRedYellowGreenState("0")
+            client_socket.sendall(state.encode('utf-8'))
+
+    except Exception as e:
+        print(f"Erreur dans la communication TCP : {e}")
+
+    finally:
+        client_socket.close()
+        server_socket.close()
 
 
 def generate_routefile():
@@ -76,8 +117,8 @@ RED_DURATION = 30
 def run():
     """execute the TraCI control loop"""
     step = 0
-    # we start with phase 2 where EW has green
-    # traci.trafficlight.setPhase("0", 2)
+    thread_tcp = threading.Thread(target=serveur_tcp)
+    thread_tcp.start()
 
     while traci.simulation.getMinExpectedNumber() > 0:
 
@@ -90,14 +131,24 @@ def run():
         collisions = traci.simulation.getCollidingVehiclesIDList()
         if collisions:
             print(f"Collisions détectées au pas {step}: {collisions}")
+        """
         if step % (GREEN_DURATION + RED_DURATION) < GREEN_DURATION:
             traci.trafficlight.setRedYellowGreenState("0", "GGGG")
         else:
             traci.trafficlight.setRedYellowGreenState("0", "rrrr")
+        """
+        if not command_queue.empty():
+            command = command_queue.get()
+            print(f"Commande traitée dans run() : {command}")
+            if command == "green":
+                traci.trafficlight.setRedYellowGreenState("0", "GGGG")
+            elif command == "red":
+                traci.trafficlight.setRedYellowGreenState("0", "rrrr")
+
         traci.simulationStep()
         state = traci.trafficlight.getRedYellowGreenState("0")
         print(state)
-        envoyer_donnees(state)
+        #envoyer_donnees(state)
         step += 1
 
     traci.close()
