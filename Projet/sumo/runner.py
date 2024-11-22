@@ -10,7 +10,7 @@ import random
 import socket
 import threading
 import queue
-
+import time
 state = []
 
 # we need to import python modules from the $SUMO_HOME/tools directory
@@ -24,10 +24,10 @@ from sumolib import checkBinary  # noqa
 import traci  # noqa
 
 TCP_SERVER_SEND_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_SEND_PORT = "1234"    # On choisit un port 
+TCP_SERVER_SEND_PORT = 1234    # On choisit un port 
 
 TCP_SERVER_REC_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_REC_PORT = "5678"    # On choisit un port 
+TCP_SERVER_REC_PORT = 5678    # On choisit un port 
 
 command_queue = queue.Queue()
 
@@ -39,7 +39,7 @@ def envoyer_donnees(donnees, serveur_ip=TCP_SERVER_SEND_IP, serveur_port=TCP_SER
 
 
 def serveur_tcp():
-    """ Fonction pour gérer la connexion TCP et envoyer/recevoir des données """
+    """Fonction pour gérer la connexion TCP et écouter en permanence"""
     server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_socket.bind((TCP_SERVER_REC_IP, TCP_SERVER_REC_PORT))
     server_socket.listen(1)
@@ -50,27 +50,24 @@ def serveur_tcp():
 
     try:
         while True:
-            # Recevoir des données du client
-            data = client_socket.recv(1024).decode('utf-8')
-            if not data:
-                break  # Si aucune donnée n'est reçue, on ferme la connexion
+            try:
+                data = client_socket.recv(1024).decode('utf-8')
+                if data:  # Traiter uniquement les données reçues
+                    print(f"Commande reçue : {data}")
 
-            print(f"Commande reçue : {data}")
-
-            # Ajouter la commande dans la queue
-            command_queue.put(data)
-
-            # Envoyer l'état actuel des feux au client
-            state = traci.trafficlight.getRedYellowGreenState("0")
-            client_socket.sendall(state.encode('utf-8'))
-
+                    # Ajouter la commande dans la queue
+                    #command_queue.put(data)
+                else:
+                    print("Aucune donnée reçue, mais connexion toujours active")
+                    time.sleep(2)
+            except socket.timeout:
+                print("Timeout expiré, mais la connexion reste ouverte")
     except Exception as e:
         print(f"Erreur dans la communication TCP : {e}")
-
     finally:
+        print("Fermeture de la connexion")
         client_socket.close()
         server_socket.close()
-
 
 def generate_routefile():
     random.seed(42)  # make tests reproducible
@@ -129,13 +126,14 @@ def run():
 
         # Détecter les collisions
         collisions = traci.simulation.getCollidingVehiclesIDList()
-        if collisions:
-            print(f"Collisions détectées au pas {step}: {collisions}")
+   #     if collisions:
+    #        print(f"Collisions détectées au pas {step}: {collisions}")
         """
         if step % (GREEN_DURATION + RED_DURATION) < GREEN_DURATION:
             traci.trafficlight.setRedYellowGreenState("0", "GGGG")
         else:
             traci.trafficlight.setRedYellowGreenState("0", "rrrr")
+        """
         """
         if not command_queue.empty():
             command = command_queue.get()
@@ -144,10 +142,10 @@ def run():
                 traci.trafficlight.setRedYellowGreenState("0", "GGGG")
             elif command == "red":
                 traci.trafficlight.setRedYellowGreenState("0", "rrrr")
-
+        """
         traci.simulationStep()
         state = traci.trafficlight.getRedYellowGreenState("0")
-        print(state)
+#        print(state)
         #envoyer_donnees(state)
         step += 1
 
