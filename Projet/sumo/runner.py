@@ -22,11 +22,11 @@ from sumolib import checkBinary  # noqa
 import traci  # noqa
 
 TCP_SERVER_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_PORT = "1234"    # On choisit un port 
+TCP_SERVER_PORT = 1234    # On choisit un port 
 
 def envoyer_donnees(donnees, serveur_ip=TCP_SERVER_IP, serveur_port=TCP_SERVER_PORT):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        s.connect(TCP_SERVER_IP, TCP_SERVER_PORT)
+        s.connect((TCP_SERVER_IP, TCP_SERVER_PORT))
         print(f"Connecté au serveur {serveur_ip}:{serveur_port}")
         s.sendall(donnees.encode("utf-8"))
 
