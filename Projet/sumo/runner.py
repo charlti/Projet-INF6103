@@ -23,11 +23,11 @@ else:
 from sumolib import checkBinary  # noqa
 import traci  # noqa
 
-TCP_SERVER_SEND_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_SEND_PORT = 1234    # On choisit un port 
+TCP_SERVER_SEND_IP = "0.0.0.0"   # L'IP du serveur auquel on va envoyer les données. Ici il tourne en local
+TCP_SERVER_SEND_PORT = 1234    # Le port sur lequel on va envoyer les données
 
-TCP_SERVER_REC_IP = "0.0.0.0"   # Notre serveur tcp tournera en local
-TCP_SERVER_REC_PORT = 5678    # On choisit un port 
+TCP_SERVER_REC_IP = "0.0.0.0"   # L'IP du serveur traci qui ecoute
+TCP_SERVER_REC_PORT = 5678    # Le port du serveur traci qui ecoute
 
 command_queue = queue.Queue()
 
@@ -55,15 +55,8 @@ def serveur_tcp():
                 data = client_socket.recv(1024).decode('utf-8')
                 if data:  # Si des données sont reçues
                     print(f"Commande reçue : {data}")
-                    command_queue.put(data)
+                    command_queue.put(data)	# Pour que les données récupérées par le thread serveur soient accessible 
                     print(f"Commande {data} put to queue")
-                    # Modifier l'état des feux en fonction de la commande
- #                   if data == "green":
-  #                      print("Passage des feux au vert")
- #                       traci.trafficlight.setRedYellowGreenState("0", "GGGG")  # Exemple pour 4 feux verts
-   #                 elif data == "red":
-#                        print("Passage des feux au rouge")
-                        #traci.trafficlight.setRedYellowGreenState("0", "rrrr")  # Exemple pour 4 feux rouges
 
                 else:
                     print("Aucune donnée reçue, mais connexion toujours active")
@@ -76,6 +69,9 @@ def serveur_tcp():
         print("Fermeture de la connexion")
         client_socket.close()
         server_socket.close()
+
+
+
 def generate_routefile():
     random.seed(42)  # make tests reproducible
     N = 3600  # number of time steps
@@ -122,47 +118,28 @@ def run():
     """execute the TraCI control loop"""
     step = 0
     thread_tcp = threading.Thread(target=serveur_tcp)
-    thread_tcp.start()
+    thread_tcp.start()	# On lance le serveur d'écoute dans un autre thread
 
     while traci.simulation.getMinExpectedNumber() > 0:
 
         for vehicle_id in traci.vehicle.getIDList():
             traci.vehicle.setMinGap(vehicle_id, 0.1)
-            traci.vehicle.setTau(vehicle_id, 0.5)
+            traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
+
         if not command_queue.empty():
-            traci.trafficlight.setProgram("0", "off")
+            traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
             commande = command_queue.get()  # Récupérer une commande de la queue
             print(f"Commande traitée dans run() : {commande}")
-            if commande == "green":
-
-                traci.trafficlight.setRedYellowGreenState("0", "GGGG")
-                print("Passage des feux au vert")
-            elif commande == "red":
-                traci.trafficlight.setRedYellowGreenState("0", "rrrr")
-                print("Passage des feux au rouge")
+            traci.trafficlight.setRedYellowGreenState("0", commande)
         # Détecter les collisions
         collisions = traci.simulation.getCollidingVehiclesIDList()
    #     if collisions:
     #        print(f"Collisions détectées au pas {step}: {collisions}")
-        """
-        if step % (GREEN_DURATION + RED_DURATION) < GREEN_DURATION:
-            traci.trafficlight.setRedYellowGreenState("0", "GGGG")
-        else:
-            traci.trafficlight.setRedYellowGreenState("0", "rrrr")
-        """
-        """
-        if not command_queue.empty():
-            command = command_queue.get()
-            print(f"Commande traitée dans run() : {command}")
-            if command == "green":
-                traci.trafficlight.setRedYellowGreenState("0", "GGGG")
-            elif command == "red":
-                traci.trafficlight.setRedYellowGreenState("0", "rrrr")
-        """
         traci.simulationStep()
         state = traci.trafficlight.getRedYellowGreenState("0")
 #        print(state)
-        #envoyer_donnees(state)
+        if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
+            envoyer_donnees(state)
         step += 1
 
     traci.close()

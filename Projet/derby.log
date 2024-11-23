@@ -1,6 +1,6 @@
 ----------------------------------------------------------------
-2024-11-22 14:37:43.408 GMT:
- Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0193-544e-b022-00000398df70 
+2024-11-23 19:33:35.719 GMT:
+ Booting Derby version The Apache Software Foundation - Apache Derby - 10.6.1.0 - (938214): instance a816c00e-0193-5a83-ed3a-000005c1d2b0 
 on database directory /opt/tomcat6/apache-tomcat-6.0.53/bin/scadabrDB   with class loader WebappClassLoader
   context: /ScadaBR
   delegate: false
