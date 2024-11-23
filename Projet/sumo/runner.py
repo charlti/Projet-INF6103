@@ -51,12 +51,20 @@ def serveur_tcp():
     try:
         while True:
             try:
+                # Recevoir les données
                 data = client_socket.recv(1024).decode('utf-8')
-                if data:  # Traiter uniquement les données reçues
+                if data:  # Si des données sont reçues
                     print(f"Commande reçue : {data}")
+                    command_queue.put(data)
+                    print(f"Commande {data} put to queue")
+                    # Modifier l'état des feux en fonction de la commande
+ #                   if data == "green":
+  #                      print("Passage des feux au vert")
+ #                       traci.trafficlight.setRedYellowGreenState("0", "GGGG")  # Exemple pour 4 feux verts
+   #                 elif data == "red":
+#                        print("Passage des feux au rouge")
+                        #traci.trafficlight.setRedYellowGreenState("0", "rrrr")  # Exemple pour 4 feux rouges
 
-                    # Ajouter la commande dans la queue
-                    #command_queue.put(data)
                 else:
                     print("Aucune donnée reçue, mais connexion toujours active")
                     time.sleep(2)
@@ -68,7 +76,6 @@ def serveur_tcp():
         print("Fermeture de la connexion")
         client_socket.close()
         server_socket.close()
-
 def generate_routefile():
     random.seed(42)  # make tests reproducible
     N = 3600  # number of time steps
@@ -119,11 +126,20 @@ def run():
 
     while traci.simulation.getMinExpectedNumber() > 0:
 
-        traci.trafficlight.setProgram("0", "off")
         for vehicle_id in traci.vehicle.getIDList():
             traci.vehicle.setMinGap(vehicle_id, 0.1)
             traci.vehicle.setTau(vehicle_id, 0.5)
+        if not command_queue.empty():
+            traci.trafficlight.setProgram("0", "off")
+            commande = command_queue.get()  # Récupérer une commande de la queue
+            print(f"Commande traitée dans run() : {commande}")
+            if commande == "green":
 
+                traci.trafficlight.setRedYellowGreenState("0", "GGGG")
+                print("Passage des feux au vert")
+            elif commande == "red":
+                traci.trafficlight.setRedYellowGreenState("0", "rrrr")
+                print("Passage des feux au rouge")
         # Détecter les collisions
         collisions = traci.simulation.getCollidingVehiclesIDList()
    #     if collisions:
