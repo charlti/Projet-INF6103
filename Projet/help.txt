@@ -5,7 +5,7 @@ Le script start_openplc_runtime pour lancer OpenPLC runtime.
 Pour y accéder : http://localhost:8080 ou http://ip_publique:8080 (openplc-openplc)
 
 Créer le réseau docker : docker network create --subnet 192.168.1.0/24 my_network
-Lancer les conteneurs : plc1 : sudo docker run --net my_network --ip 192.168.1.11 -p 502:502 plc1
+Lancer les conteneurs : plc1 : sudo docker run --net my_network --ip 192.168.1.11 -p 502:502 -d plc1
 Puis 192.168.1.12, .13, .14 pour les plc suivants
 
 Vérifier que le port 502 est bien exposé car les conteneurs n'acceptent pas les ping : nc -zv ip_plc 502
