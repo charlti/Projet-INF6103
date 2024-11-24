@@ -18,7 +18,6 @@ def read_coils():
     # Établir la connexion avec le PLC
     if client.connect():
         print("READ COILS : Connexion au PLC réussie. \n")
-    #    client.write_coil(0,True)
         # Lire les valeurs des coils à partir d'une adresse donnée
         adresse_debut = 0  # Adresse Modbus du premier coil (bobine)
         nombre_coils = 8  # Nombre de coils à lire (lire 10 coils à partir de l'adresse 0)
@@ -165,5 +164,4 @@ if __name__ == "__main__":
     thread_write_coils.start()
     while True:
         envoyer_donnees()
-        write_coils()
 
