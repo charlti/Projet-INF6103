@@ -130,9 +130,9 @@ def run():
  #           traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
   #          commande = command_queue.get()  # Récupérer une commande de la queue
    #         print(f"Commande traitée dans run() : {commande}")
-    #        traci.trafficlight.setRedYellowGreenState("0", commande)
+    #        traci.trafficlight.setRedYellowGreenState("GS_208908792", commande)
         # Détecter les collisions
-        traci.trafficlight.setRedYellowGreenState("0", "GGGG")
+        traci.trafficlight.setRedYellowGreenState("GS_208908792", "GGGG")
         collisions = traci.simulation.getCollidingVehiclesIDList()
         veh_id = traci.vehicle.getIDList()
         for id in veh_id:
@@ -141,7 +141,7 @@ def run():
    #     if collisions:
     #        print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
-        state = traci.trafficlight.getRedYellowGreenState("0")
+        state = traci.trafficlight.getRedYellowGreenState("GS_208908792")
         if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
             envoyer_donnees(state)
         step += 1
