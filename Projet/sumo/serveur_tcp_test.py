@@ -13,7 +13,7 @@ TCP_SERVER_REC_PORT = 1234    # Port de notre serveur d'écoute
 command_queue = queue.Queue()
 
 def read_coils():
-    client = ModbusTcpClient('0.0.0.0', port=502)
+    client = ModbusTcpClient('192.168.1.11', port=502)
 
     # Établir la connexion avec le PLC
     if client.connect():
@@ -65,7 +65,7 @@ def write_coils():
                 register_values_to_send.append('False')
         print(f'DONNEES A ENVOYER AU PLC : {register_values_to_send}')
 
-        client = ModbusTcpClient('0.0.0.0', port=502)
+        client = ModbusTcpClient('192.168.1.11', port=502)
 
         # Établir la connexion avec le PLC
         if client.connect():

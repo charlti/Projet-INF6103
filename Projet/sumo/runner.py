@@ -122,17 +122,22 @@ def run():
 
     while traci.simulation.getMinExpectedNumber() > 0:
 
-        for vehicle_id in traci.vehicle.getIDList():
-            traci.vehicle.setMinGap(vehicle_id, 0.1)
-            traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
+#        for vehicle_id in traci.vehicle.getIDList():
+ #           traci.vehicle.setMinGap(vehicle_id, 0.1)
+  #          traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
 
-        if not command_queue.empty():
-            traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
-            commande = command_queue.get()  # Récupérer une commande de la queue
-            print(f"Commande traitée dans run() : {commande}")
-            traci.trafficlight.setRedYellowGreenState("0", commande)
+#        if not command_queue.empty():
+ #           traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
+  #          commande = command_queue.get()  # Récupérer une commande de la queue
+   #         print(f"Commande traitée dans run() : {commande}")
+    #        traci.trafficlight.setRedYellowGreenState("0", commande)
         # Détecter les collisions
+        traci.trafficlight.setRedYellowGreenState("0", "GGGG")
         collisions = traci.simulation.getCollidingVehiclesIDList()
+        veh_id = traci.vehicle.getIDList()
+        for id in veh_id:
+            traci.vehicle.setSpeedMode(id, 0x19)
+#        print(veh_id)
    #     if collisions:
     #        print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
@@ -143,6 +148,7 @@ def run():
 
     traci.close()
     sys.stdout.flush()
+
 
 def state():
     return state

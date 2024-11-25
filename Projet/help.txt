@@ -10,10 +10,25 @@ Puis 192.168.1.12, .13, .14 pour les plc suivants
 
 Vérifier que le port 502 est bien exposé car les conteneurs n'acceptent pas les ping : nc -zv ip_plc 502
 
-Lancer le docker scadaBR : docker run --net test_network --ip 192.168.1.6 --privileged -p8080:8080 -p8081:3306 --name ScadaBR --restart always -itd carloskze/scadabr:latest
+Image docker scadaBR : https://hub.docker.com/r/cmdviegas/scadabr
+Pull avec : sudo docker pull cmdviegas/scadabr:1.2
+
+Créer le docker scadaBR : docker run --net test_network --ip 192.168.1.5 -p8080:8080 --name scada -itd cmdviegas/scadabr:1.2
+Lancer le conteneur scadaBR : sudo docker start scada
+
+Lancer le conteneur PLC1 : sudo docker start PLC1
 
 Arpsoof : sudo arpspoof -i <id_interface_reseau_docker> -r -t 192.168.1.11 192.168.1.6
 
 Tcpdump : sudo tcpdump -i <id_interface_reseau_docker>
 
+Pour les collisions : 
+Les bits du mode de vitesse
+Le mode de vitesse est un entier où chaque bit active/désactive une règle particulière :
 
+0x01 : Respecter les feux de signalisation.
+0x02 : Respecter les limitations de vitesse.
+0x04 : Respecter la vitesse des autres véhicules (distance de sécurité).
+0x08 : Respecter la géométrie (virages, intersections, etc.).
+0x10 : Ignorer les collisions.
+Par défaut, le mode de vitesse est 31 (0b11111), ce qui active toutes les règles.
