@@ -12,6 +12,7 @@ import threading
 import queue
 import time
 state = []
+tls_id = "GS_cluster_246456340_246456354"
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -122,9 +123,9 @@ def run():
 
     while traci.simulation.getMinExpectedNumber() > 0:
 
-#        for vehicle_id in traci.vehicle.getIDList():
- #           traci.vehicle.setMinGap(vehicle_id, 0.1)
-  #          traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
+        for vehicle_id in traci.vehicle.getIDList():
+           traci.vehicle.setMinGap(vehicle_id, 0.1)
+           traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
 
 #        if not command_queue.empty():
  #           traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
@@ -132,7 +133,7 @@ def run():
    #         print(f"Commande traitée dans run() : {commande}")
     #        traci.trafficlight.setRedYellowGreenState("GS_208908792", commande)
         # Détecter les collisions
-        traci.trafficlight.setRedYellowGreenState("GS_208908792", "GGGG")
+        # traci.trafficlight.setRedYellowGreenState(tls_id, "GGGG")
         collisions = traci.simulation.getCollidingVehiclesIDList()
         veh_id = traci.vehicle.getIDList()
         for id in veh_id:
@@ -141,10 +142,12 @@ def run():
    #     if collisions:
     #        print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
-        state = traci.trafficlight.getRedYellowGreenState("GS_208908792")
+        state = traci.trafficlight.getRedYellowGreenState(tls_id)
         if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
-            envoyer_donnees(state)
+            # envoyer_donnees(state) 
+            continue 
         step += 1
+
 
     traci.close()
     sys.stdout.flush()
@@ -187,7 +190,7 @@ if __name__ == "__main__":
 
     # this is the normal way of using traci. sumo is started as a
     # subprocess and then the python script connects and runs
-    traci.start([sumoBinary, "-c", "data/cross.sumocfg",
-                             "--tripinfo-output", "tripinfo.xml"])
+    traci.start([sumoBinary, "-c", "data_sim/osm.sumocfg" ])
     
+    #"--tripinfo-output", "tripinfo.xml"
     run()
