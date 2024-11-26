@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- generated on 2024-11-25 22:30:25 by Eclipse SUMO netconvert Version 1.21.0
+<!-- generated on 2024-11-26 11:10:38 by Eclipse SUMO netconvert Version 1.15.0
 -->
 
-<netconvertConfiguration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
+<configuration xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://sumo.dlr.de/xsd/netconvertConfiguration.xsd">
 
     <input>
-        <type-files value="${SUMO_HOME}\data\typemap\osmNetconvert.typ.xml"/>
+        <type-files value="${SUMO_HOME}/data/typemap/osmNetconvert.typ.xml"/>
         <osm-files value="osm_bbox.osm.xml.gz"/>
     </input>
 
@@ -32,13 +32,13 @@
         <ramps.guess value="true"/>
     </ramp_guessing>
 
-    <edge_removal>
-        <keep-edges.by-vclass value="passenger"/>
-    </edge_removal>
-
     <junctions>
         <junctions.join value="true"/>
         <junctions.corner-detail value="5"/>
     </junctions>
 
-</netconvertConfiguration>
+    <report>
+        <verbose value="true"/>
+    </report>
+
+</configuration>

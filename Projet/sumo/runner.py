@@ -12,7 +12,7 @@ import threading
 import queue
 import time
 state = []
-tls_id = "GS_cluster_246456340_246456354"
+tls_id = "GS_5305425602"
 
 # we need to import python modules from the $SUMO_HOME/tools directory
 if 'SUMO_HOME' in os.environ:
@@ -118,14 +118,13 @@ RED_DURATION = 30
 def run():
     """execute the TraCI control loop"""
     step = 0
-    thread_tcp = threading.Thread(target=serveur_tcp)
-    thread_tcp.start()	# On lance le serveur d'écoute dans un autre thread
+    # thread_tcp = threading.Thread(target=serveur_tcp)
+    # thread_tcp.start()	# On lance le serveur d'écoute dans un autre thread
 
     while traci.simulation.getMinExpectedNumber() > 0:
-
-        for vehicle_id in traci.vehicle.getIDList():
-           traci.vehicle.setMinGap(vehicle_id, 0.1)
-           traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
+        # for vehicle_id in traci.vehicle.getIDList():
+        #    traci.vehicle.setMinGap(vehicle_id, 0.1)
+        #    traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
 
 #        if not command_queue.empty():
  #           traci.trafficlight.setProgram("0", "off")	# On désactive le controle des feux par le XML
@@ -133,22 +132,20 @@ def run():
    #         print(f"Commande traitée dans run() : {commande}")
     #        traci.trafficlight.setRedYellowGreenState("GS_208908792", commande)
         # Détecter les collisions
-        # traci.trafficlight.setRedYellowGreenState(tls_id, "GGGG")
-        collisions = traci.simulation.getCollidingVehiclesIDList()
-        veh_id = traci.vehicle.getIDList()
-        for id in veh_id:
-            traci.vehicle.setSpeedMode(id, 0x19)
+        traci.trafficlight.setRedYellowGreenState(tls_id, "GGGG")
+        # collisions = traci.simulation.getCollidingVehiclesIDList()
+        # veh_id = traci.vehicle.getIDList()
+        # for id in veh_id:
+        #     traci.vehicle.setSpeedMode(id, 0x19)
 #        print(veh_id)
    #     if collisions:
     #        print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
-        state = traci.trafficlight.getRedYellowGreenState(tls_id)
-        if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
-            # envoyer_donnees(state) 
-            continue 
+        # state = traci.trafficlight.getRedYellowGreenState(tls_id)
+        # if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
+        #     # envoyer_donnees(state) 
+        #     continue 
         step += 1
-
-
     traci.close()
     sys.stdout.flush()
 
@@ -190,7 +187,7 @@ if __name__ == "__main__":
 
     # this is the normal way of using traci. sumo is started as a
     # subprocess and then the python script connects and runs
-    traci.start([sumoBinary, "-c", "data_sim/osm.sumocfg" ])
+    traci.start([sumoBinary, "-c", "data_sim/osm.sumocfg"])
     
     #"--tripinfo-output", "tripinfo.xml"
     run()
