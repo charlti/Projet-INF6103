@@ -116,7 +116,6 @@ GREEN_DURATION = 30
 RED_DURATION = 30
 
 def run():
-    """execute the TraCI control loop"""
     step = 0
     thread_tcp = threading.Thread(target=serveur_tcp)
     thread_tcp.start()	# On lance le serveur d'écoute dans un autre thread
@@ -129,14 +128,9 @@ def run():
         veh_id = traci.vehicle.getIDList()
         for id in veh_id:
             if traci.trafficlight.getRedYellowGreenState(tls_id) == "GGGG":
-#                traci.vehicle.setSpeedMode(id, 0)
- #               traci.vehicle.setSpeed(id, 2)
                  traci.vehicle.setMinGap(id, 0.5)
                  traci.vehicle.setTau(id, 0.5)
         collisions = traci.simulation.getCollidingVehiclesIDList()
-       # for id in veh_id:
-        #    traci.vehicle.setSpeedMode(id, 0x19)
-#        print(veh_id)
         if collisions:
             print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
@@ -147,19 +141,6 @@ def run():
     traci.close()
     sys.stdout.flush()
 
-
-def state():
-    return state
-
-def changeState(newState, id):
-    state[id] = newState
-
-def toReadableState(state):
-    readbleState = ""
-    for s in state:
-        readbleState += s
-    print(readbleState)
-    return readbleState
 
 def get_options():
     optParser = optparse.OptionParser()
