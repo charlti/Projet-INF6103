@@ -120,31 +120,29 @@ def run():
     step = 0
     thread_tcp = threading.Thread(target=serveur_tcp)
     thread_tcp.start()	# On lance le serveur d'écoute dans un autre thread
-
     while traci.simulation.getMinExpectedNumber() > 0:
- #       for vehicle_id in traci.vehicle.getIDList():
-      #      traci.vehicle.setMinGap(vehicle_id, 0.1)
-#            traci.vehicle.setTau(vehicle_id, 0.5)	# Modification du comportement des véhicules
-
         if not command_queue.empty():
             traci.trafficlight.setProgram(tls_id, "off")	# On désactive le controle des feux par le XML
             commande = command_queue.get()  # Récupérer une commande de la queue
-   #         print(f"Commande traitée dans run() : {commande}")
             traci.trafficlight.setRedYellowGreenState(tls_id, commande)
         # Détecter les collisions
-        #traci.trafficlight.setRedYellowGreenState(tls_id, "GGGG")
-        collisions = traci.simulation.getCollidingVehiclesIDList()
         veh_id = traci.vehicle.getIDList()
         for id in veh_id:
-            traci.vehicle.setSpeedMode(id, 0x19)
+            if traci.trafficlight.getRedYellowGreenState(tls_id) == "GGGG":
+#                traci.vehicle.setSpeedMode(id, 0)
+ #               traci.vehicle.setSpeed(id, 2)
+                 traci.vehicle.setMinGap(id, 0.5)
+                 traci.vehicle.setTau(id, 0.5)
+        collisions = traci.simulation.getCollidingVehiclesIDList()
+       # for id in veh_id:
+        #    traci.vehicle.setSpeedMode(id, 0x19)
 #        print(veh_id)
         if collisions:
             print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
         state = traci.trafficlight.getRedYellowGreenState(tls_id)
-        if step % 10 == 0:	# A voir tous les combien de step on envoie les donnees
+        if step % 10 == 0
             envoyer_donnees(state)
-        #     continue 
         step += 1
     traci.close()
     sys.stdout.flush()
