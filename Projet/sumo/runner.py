@@ -141,7 +141,7 @@ def run():
             print(f"Collisions détectées au pas {step}: {collisions}")
         traci.simulationStep()
         state = traci.trafficlight.getRedYellowGreenState(tls_id)
-        if step % 10 == 0
+        if step % 10 == 0:
             envoyer_donnees(state)
         step += 1
     traci.close()
